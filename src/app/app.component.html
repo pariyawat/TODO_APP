@@ -1,30 +1,149 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to Todo List App
-  </h1>
-  <img width="300" alt="Angular Logo"
-    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<nav>
+  <div class="nav-wrapper deep-purple darken-4">
+    <a href="#" class="brand-logo"> TODO LIST</a>
+    <ul id="nav-mobile" class="right hide-on-med-and-down">
+      <li *ngIf="haveSession"><a> {{userData.name}}</a></li>
+      <li> <button *ngIf="!haveSession" (click)="socialSignIn('facebook')" class="btn  btn-social btn-facebook"
+          style="margin: 10px;">
+          <span class="fa fa-facebook"></span> Sign in with Facebook </button></li>
+      <li>
+        <button *ngIf="haveSession" (click)="socialLogout()" class="btn  btn-social btn-facebook" style="margin: 10px;">
+          <span class="fa fa-facebook"></span> Logout </button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Modal Trigger -->
+<button data-target="modal1" (click)="bottomSheetModal.openModal()" class="btn modal-trigger">Modal</button>
+
+<mz-modal #bottomSheetModal>
+  <mz-modal-header>
+    <h4>Edit Task</h4>
+  </mz-modal-header>
+  <mz-modal-content>
+    <div class="input-field ">
+      <input type="text" [formControl]="editName">
+      <label for="first_name">Name</label>
+    </div>
+
+    <div class="input-field">
+        <textarea class="materialize-textarea " [formControl]="editDetial"></textarea>
+        <label> Detial</label>
+      </div>
+  </mz-modal-content>
+  <mz-modal-footer>
+    <button data-target="modal1" (click)="bottomSheetModal.closeModal()"
+      class="btn modal-trigger  red accent-3cus-buttom white-text" style="margin-right: 10px;">Dissmiss</button>
+    <button data-target="modal1" (click)="save()"  (click)="bottomSheetModal.closeModal()"class="btn modal-trigger  ">Save</button>
+  </mz-modal-footer>
+</mz-modal>
+
+
+<div class="row center" *ngIf="!haveSession">
+  <div class="col s12">
+    <div class="card blue-grey darken-1">
+      <div class="card-content white-text">
+        <span class="card-title">PLEASE SIGN IN</span>
+        <p>You must to sign in first! </p>
+      </div>
+      <div class="card-action">
+        <a href="#" (click)="socialSignIn('facebook')">Sign in with Facebook</a>
+
+      </div>
+    </div>
+  </div>
 </div>
-<h2>Add todo</h2>
 
-<div>
-  <input type="text" [formControl]="todoInput">
-  <button (click)="addTodo(todoInput.value)">Add</button>
+<div class="row " *ngIf="haveSession">
+  <div class="col s12 m4">
+    <h3 class="center ">TODO</h3>
+    <hr>
+    <div class="card blue-grey darken-1">
+      <div class="card-content white-text ">
+        <span class="card-title">Create todo</span>
+        <br>
+        <div class="input-field white-text">
+          <input type="text" class=" white-text" [formControl]="name">
+          <label for="first_name">Name</label>
+        </div>
+
+        <div class="input-field">
+          <textarea class="materialize-textarea  white-text" [formControl]="detial"></textarea>
+          <label> Detial</label>
+        </div>
+      </div>
+      <div class="card-action">
+        <a class="waves-effect waves-light pink btn" (click)="creat()">+ Create</a>
+      </div>
+    </div>
+
+    <div *ngFor="let task of taskData">
+      <div class="card light-blue accent-4 white-text" *ngIf="task.task_status == 'opened'">
+        <div class="card-content white-text">
+            <span class="new badge " data-badge-caption="">Last update: {{task.time_stamp}}</span>
+          <span class="card-title">{{task.task_name}}</span>
+
+          
+          <p>{{task.task_detial}}</p>
+        </div>
+        <div class="card-action white-text">
+          <a class="waves-effect waves-light btn-small  purple darken-4 cus-buttom white-text"
+            (click)="bottomSheetModal.openModal()" (click)="edit(task)" >Edit</a>
+          <a class="waves-effect waves-light btn-small amber darken-3 cus-buttom white-text"
+            (click)=" moveToInprogress(task.task_id)">Move to inprogress</a>
+          <a class="waves-effect waves-light btn-small green accent-4 cus-buttom white-text"
+            (click)=" moveToDone(task.task_id)">move to done</a>
+          <a class="waves-effect waves-light btn-small  red accent-3cus-buttom white-text"
+            (click)="delete(task.task_id)">delete</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col s12 m4">
+    <h3 class="center ">INPROGRESS</h3>
+    <hr>
+    <div *ngFor="let task of taskData">
+      <div class="card amber darken-3" *ngIf="task.task_status == 'inprogress'">
+        <div class="card-content white-text">
+                    <span class="new badge " data-badge-caption="">Last update: {{task.time_stamp}}</span>
+          <span class="card-title">{{task.task_name}}</span>
+          
+          <p>{{task.task_detial}}</p>
+        </div>
+        <div class="card-action">
+          <a class="waves-effect waves-light btn-small  purple darken-4 cus-buttom white-text " (click)="bottomSheetModal.openModal()" (click)="edit(task)">Edit</a>
+          <a class="waves-effect waves-light btn-small light-blue accent-4 cus-buttom white-text"
+            (click)=" moveToOpened(task.task_id)">Move to todo</a>
+          <a class="waves-effect waves-light btn-small green accent-4 cus-buttom white-text"
+            (click)=" moveToDone(task.task_id)">move to done</a>
+          <a class="waves-effect waves-light btn-small  red accent-3cus-buttom white-text"
+            (click)="delete(task.task_id)">delete</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="col s12 m4">
+    <h3 class="center ">DONE</h3>
+    <hr>
+    <div *ngFor="let task of taskData">
+      <div class="card green accent-4" *ngIf="task.task_status == 'done'">
+        <div class="card-content white-text">
+            <span class="new badge " data-badge-caption="">Last update: {{task.time_stamp}}</span>
+          <span class="card-title">{{task.task_name}}</span>
+          <p>{{task.task_detial}}</p>
+        </div>
+        <div class="card-action">
+          <a class="waves-effect waves-light btn-small light-blue accent-4 cus-buttom white-text"
+            (click)=" moveToOpened(task.task_id)">Move to todo</a>
+          <a class="waves-effect waves-light btn-small amber darken-3 cus-buttom white-text"
+            (click)=" moveToInprogress(task.task_id)">Move to inprogress</a>
+          <a class="waves-effect waves-light btn-small  red accent-3cus-buttom white-text"
+            (click)="delete(task.task_id)">delete</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-
-<br>
-<h3> List todo  </h3>
-<ul>
-  <li  *ngFor="let todo of todoArr; let idex = index">{{todo}}
-    <span class="action">Edit</span>
-    <span class="action" (click)="delete(idex)">Delete</span>
-    <span class="action" (click)="done(idex, todo)">Done</span>
-  </li>
-</ul>
-
-<h3> Done list</h3>
-<ul>
-  <li *ngFor="let done of doneArr; let idex = index">{{done}}
-  </li>
-</ul>
